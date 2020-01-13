@@ -60,12 +60,14 @@
                 radialGradient: ["fill", "stroke"]
             };
             //Change definition ids and their usages
-            const elementDefs = xmlDoc.querySelectorAll("defs " + "[id]");
+            const elementDefs = xmlDoc.querySelectorAll("[id]");
             for (let i = 0; i < elementDefs.length; i++) {
                 let def = elementDefs[i];
                 let oldId = def.id
                 let newId = guid()
                 def.id = newId
+                def.removeAttribute('id')
+                def.setAttribute(':id', '`' + newId + '-${_uid}' + '`')
                 //Update xlink:href="#text-3" 
                 //This fiddle was useful: http://fiddle.jshell.net/eg43L/3/
                 const uses = xmlDoc.querySelectorAll(`[*|href="#${oldId}"]`)
@@ -73,7 +75,8 @@
                     console.log('use found')
                     //use.setAttribute("http://www.w3.org/1999/xlink", 'href', '#'+newId)
                     //use.setAttributeNS('xlink', 'href', '#'+newId)
-                    use.setAttribute('xlink:href', '#' + newId)
+                    use.removeAttribute('xlink:href')
+                    use.setAttribute(':xlink:href', '`#' + newId + '-${_uid}' + '`')
                 })
                 //Update attributes like: filter="url(#filter-4)"
                 Object.keys(iriElementsAndProperties).forEach((elem) => {
@@ -83,7 +86,8 @@
                             "[" + prop + '*="' + oldId + '"]'
                         );
                         Array.from(referencingElements).forEach((refelem) => {
-                            refelem.setAttribute(prop, `url(#${newId})`)
+                            refelem.removeAttribute(prop)
+                            refelem.setAttribute(`:${prop}`, '`' + `url(#${newId}` + '-${_uid}' + ')`')
                         })
                     })
                 })
